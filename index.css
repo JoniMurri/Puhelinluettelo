@@ -1,0 +1,14 @@
+body {
+  background-color: #70a6db; /* Vaalea taustaväri */
+  font-family: Arial, sans-serif;
+}
+
+/* Otsikon tyylit */
+.mainheader {
+  text-align: center; /* Keskitetään otsikko */
+  font-size: 3rem; /* Iso fonttikoko */
+  color: #4caf50; /* Vihreä väri otsikolle */
+  font-weight: bold;
+  margin-bottom: 30px; /* Lisää väliä otsikon alle */
+  text-shadow: 2px 2px 4px rgba(173, 36, 36, 0.1); /* Pehmeä varjo otsikon taustalle */
+}

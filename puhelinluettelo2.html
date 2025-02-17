@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etsi puhelinnumero</title>
+    <link
+      href="
+    node_modules/bootstrap/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <link
+      href="
+  node_modules/bootstrap/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Sivupalkki -->
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-dark text-white p-4" id="sidebar" style="width: 250px">
+        <ul class="list-unstyled">
+          <li>
+            <a href="index.html" class="btn btn-primary d-block py-2 mb-2"
+              >Pääsivu</a
+            >
+          </li>
+          <li>
+            <a
+              href="puhelinluettelo.html"
+              class="btn btn-primary d-block py-2 mb-2"
+              >Puhelinluettelo</a
+            >
+          </li>
+          <li>
+            <a
+              href="puhelinluettelo2.html"
+              class="btn btn-success d-block py-2 mb-2"
+              >Etsi Numero</a
+            >
+          </li>
+          <!-- Lisää linkkejä tarvittaessa -->
+        </ul>
+      </div>
+
+      <!-- Pääsisältö -->
+      <div class="container-fluid" id="page-content-wrapper">
+        <div class="container py-5">
+          <h1 class="display-4 text-center">Etsi puhelinnumero</h1>
+
+          <form id="form" name="form">
+            <div class="row mb-3">
+              <label for="nimi" class="col-sm-2 col-form-label"
+                >Syötä nimi:</label
+              >
+              <div class="col-sm-10">
+                <input
+                  name="nimi"
+                  id="nimi"
+                  type="text"
+                  class="form-control"
+                  placeholder="Syötä nimi"
+                  maxlength="35"
+                />
+              </div>
+            </div>
+
+            <!-- Nappi puhelinnumeron hakemiseen -->
+            <div class="row mb-3">
+              <div class="col-sm-12 text-center">
+                <button
+                  id="nameButton"
+                  type="button"
+                  name="submit"
+                  class="btn btn-primary btn-lg"
+                >
+                  Hae puhelinnumero
+                </button>
+              </div>
+            </div>
+
+            <!-- Näytetään löydetty puhelinnumero -->
+            <div class="row">
+                <label for="puhelinnro" class="col-sm-2 col-form-label">Löydetty puhelinnumero:</label>
+                <div class="col-sm-10">
+                    <input
+                        name="puhelin"
+                        id="puhelinnro"
+                        type="text"
+                        class="form-control"
+                        readonly
+                    />
+                </div>
+            </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        $("#nameButton").click(function () {
+          var nimi = $("#nimi").val().trim();
+
+          if (nimi === "") {
+            alert("Syötä nimi!");
+            return;
+          }
+
+          $.ajax({
+            url: "http://a41d.k.time4vps.cloud:3001/henkilot", // API-osoite
+            method: "GET", // GET-metodi
+            dataType: "json", // Odotetaan JSON-tietoa
+            success: function (response) {
+              // Haetaan henkilö listasta nimen perusteella
+              var loydetytHenkilot = response.filter(function (henkilo) {
+                // Pilkotaan sekä syötetty nimi että löytynyt nimi osiin
+                var syotettyNimi = nimi
+                  .toLowerCase()
+                  .trim()
+                  .split(" ")
+                  .sort()
+                  .join(" ");
+                var henkiloNimi = henkilo.nimi
+                  .toLowerCase()
+                  .trim()
+                  .split(" ")
+                  .sort()
+                  .join(" ");
+
+                // Debuggaus
+                console.log(
+                  "Vertailu",
+                  henkilo.nimi,
+                  "hakeatti nimi:",
+                  nimi
+                );
+
+                // Vertailu: otetaan huomioon vain nimien osat, ei järjestys
+                return syotettyNimi === henkiloNimi;
+              });
+              // Debuggaus: tulostetaan kaikki löytyneet henkilöt
+              console.log("Löydetyt henkilöt:", loydetytHenkilot);
+
+              // Jos henkilö löytyy, näytetään hänen puhelinnumeronsa
+              if (loydetytHenkilot.length > 0) {
+                // Jos löytyy useita, otetaan ensimmäinen
+                $("#puhelinnro").val(loydetytHenkilot[0].puhelin); // Asetetaan puhelinnumero kenttään
+              } else {
+                alert("Nimeä ei löytynyt.");
+                $("#puhelinnro").val(""); // Tyhjennetään puhelinnumero kenttä
+              }
+            },
+            error: function (xhr, status, error) {
+              console.log("Virhe AJAX-haussa:", status, error);
+              alert("Virhe tietojen haussa.");
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
